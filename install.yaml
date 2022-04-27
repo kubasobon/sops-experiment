@@ -1,0 +1,29 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: sops-experiment
+  namespace: flux-app
+spec:
+  interval: 1m0s
+  ref:
+    branch: master
+  secretRef:
+    name: kuba-github-token
+  url: https://github.com/kubasobon/sops-experiment.git
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: sops-experiment
+  namespace: flux-app
+spec:
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg
+  interval: 1m0s
+  path: ./encrypted-data
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: sops-experiment
